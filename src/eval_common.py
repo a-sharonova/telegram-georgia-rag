@@ -14,9 +14,10 @@ import config
 
 
 def load_golden(*, category: str | None = None, path: Path | None = None) -> list[dict]:
-    """Load eval/golden_queries.jsonl, optionally filtered to one category
-    (multi_source / one_answer / no_answer / critical)."""
-    path = path or (config.EVAL_DIR / "golden_queries.jsonl")
+    """Load eval/golden_queries.<country>.jsonl (one hand-curated set per
+    country profile — see countries/__init__.py), optionally filtered to
+    one category (multi_source / one_answer / no_answer / critical)."""
+    path = path or (config.EVAL_DIR / f"golden_queries.{config.PROFILE.key}.jsonl")
     if not path.exists():
         raise SystemExit(f"{path} not found")
     with path.open(encoding="utf-8") as f:

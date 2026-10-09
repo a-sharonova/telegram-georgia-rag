@@ -9,6 +9,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from countries import PROFILE  # noqa: E402 — country profile (see countries/__init__.py);
+# every genuinely country-specific value below is read from PROFILE, every
+# other setting in this file stays shared across every deployment.
+
 # --- Paths ---
 ROOT = Path(__file__).parent
 # DATA_DIR/CHROMA_DIR are env-overridable (GEORGIA_DATA_DIR/GEORGIA_CHROMA_DIR)
@@ -150,7 +154,7 @@ REASONING_MODELS = {
 LLM_SEED = 0
 
 # --- Vector DB ---
-COLLECTION_NAME = "georgia_chats"
+COLLECTION_NAME = f"{PROFILE.key}_chats"  # "georgia_chats" for the default profile
 
 # --- Contact masking (src/rag.py's _build_context) ---
 # Applied live, per-fragment, at retrieval time — NOT baked into
@@ -170,7 +174,7 @@ MASK_USERNAME_IN_PRIVATE_CHATS = True
 # are still fetched, but only to serve as reply-parents / context for threads
 # that have activity after the cutoff (see src/knowledge.py). Empty string =
 # no date cutoff (fall back to INGEST_LIMIT alone).
-INGEST_SINCE = "2024-01-01"       # ISO date; revisit when type-based ranking lands
+INGEST_SINCE = PROFILE.ingest_since  # ISO date, per-country (countries/<key>.py)
 INGEST_PARENT_LOOKBACK_DAYS = 30  # extra history before the cutoff, parents only
 INGEST_LIMIT = 50000              # safety cap on messages fetched per chat per run
 
@@ -255,7 +259,7 @@ SUPPORT_BANK_RECIPIENT = os.getenv("SUPPORT_BANK_RECIPIENT", "<recipient name �
 SUPPORT_BANK_INFO = (
     f"{SUPPORT_BANK_NAME}, получатель <code>{SUPPORT_BANK_RECIPIENT}</code>\n"
     f"IBAN: <code>{SUPPORT_BANK_IBAN}</code>\n"
-    "От 3₾ / ~$1."
+    f"{PROFILE.support_min_text}"
 )
 
 # --- Retrieval + RAG evaluation (src/eval_retrieval.py, src/eval_rag.py) ---
@@ -276,17 +280,7 @@ RETRIEVAL_EVAL_THRESHOLDS = [0.0, 0.2, 0.3, 0.4, 0.45, 0.5, 0.55, 0.6, 0.7]
 # chat (Telegram's restriction, not ours) — see src/ingest.py::_chat_link.
 # Fetching a private chat requires the Telethon session's own account
 # (config.TELEGRAM_PHONE) to already be a member — it can't be added "blind".
-CHATS = [
-    {"username": "helpgeorgia", "chat_id": -1001452236047, "title": "Взаимопомощь. Грузия"},
-    {"username": "ipgeorgiachat", "chat_id": -1001670908431, "title": "ИП/Бизнес Грузия"},
-    {"username": "nogotochki", "chat_id": -1001318697228, "title": "Ноготочки", "private": True},
-    {"username": "paravaingeorgia", "chat_id": -1001512786455, "title": "Получение водительских прав в Грузии"},
-    # Candidates being analyzed (spam ratio / thread yield) before committing
-    # to full distillation — see data/eval/chat_analysis.jsonl.
-    {"username": "mygeorgia_chat", "chat_id": -1001486751358, "title": "ГРУЗИЯ ЧАТ"},
-    {"username": "tbilisi_girl", "chat_id": -1001549075106, "title": "Женский чат Тбилиси"},
-    {"username": "georgia_it", "chat_id": -1001688709586, "title": "Грузия IT чат"},
-    {"username": "gruzia_medicina", "chat_id": -1001781403833, "title": "Грузия медицина"},
-    {"username": "georgia_woman", "chat_id": -1001276829180, "title": "Тбилиси женский чат"},
-    {"username": "Gruziya_Mastera", "chat_id": -1001896208901, "title": "Грузия мастера услуги Батуми Тбилиси"},
-]
+# The actual list lives per-country in countries/<key>.py (selected via the
+# COUNTRY env var — see countries/__init__.py) so this file itself stays
+# identical across every deployment.
+CHATS = PROFILE.chats

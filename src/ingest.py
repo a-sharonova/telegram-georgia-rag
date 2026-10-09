@@ -110,8 +110,12 @@ async def main() -> None:
         f"| fetch floor: {floor_dt.date() if floor_dt else '(none)'} "
         f"| cap: {config.INGEST_LIMIT}"
     )
+    # Session filename per profile — "georgia_ingest" for the default
+    # profile (byte-identical to before this was templated, so the existing
+    # .session file on disk keeps resolving); "spain_ingest" etc. otherwise,
+    # distinct on top of each deployment's own working directory.
     client = TelegramClient(
-        "georgia_ingest", int(config.TELEGRAM_API_ID), config.TELEGRAM_API_HASH
+        f"{config.PROFILE.key}_ingest", int(config.TELEGRAM_API_ID), config.TELEGRAM_API_HASH
     )
     await client.start(phone=config.TELEGRAM_PHONE or None)
     try:
