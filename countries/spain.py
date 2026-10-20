@@ -33,7 +33,8 @@ PROFILE = CountryProfile(
         {"username": "russians_in_spain", "chat_id": -1002020533312, "title": "Все русские в Испании"},
         {"username": "spain4ru", "chat_id": -1001101727718, "title": "Русская Испания"},
         {"username": "women_in_spain", "chat_id": -1002153985905, "title": "Женский чат. Испания"},
-        {"username": "nedvizhimost_spain", "chat_id": -1002164725134, "title": "Недвижимость. Испания"},
+        # nedvizhimost_spain deliberately left out for now (2026-10-09) —
+        # not part of the first knowledge-collection pass.
         {"username": "russians_in_barcelona", "chat_id": -1002071220069, "title": "Русские в Барселоне"},
         {"username": "spain_granitsa", "chat_id": -1001745587210, "title": "Испания Барселона Чат"},
     ],
